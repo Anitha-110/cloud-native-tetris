@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#070b14">
+
+    <title>Tetris Arena | Cloud-Native Gaming Platform</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <div class="background-grid"></div>
+
+    <header class="topbar">
+
+        <div class="brand">
+            <div class="brand-mark">T</div>
+
+            <div>
+                <h1>TETRIS <span>ARENA</span></h1>
+                <p>CLOUD GAMING PLATFORM</p>
+            </div>
+        </div>
+
+        <div class="top-actions">
+            <div class="connection-status">
+                <span class="status-dot"></span>
+                <span>ONLINE</span>
+            </div>
+
+            <button id="soundBtn" class="icon-btn" title="Toggle sound">
+                🔊
+            </button>
+        </div>
+
+    </header>
+
+
+    <main class="game-layout">
+
+        <!-- LEFT PANEL -->
+        <aside class="side-panel left-panel">
+
+            <section class="panel-card player-card">
+
+                <div class="section-label">PLAYER</div>
+
+                <div class="player-info">
+                    <div class="avatar">P</div>
+
+                    <div>
+                        <h2>PLAYER ONE</h2>
+                        <span class="player-rank">ROOKIE</span>
+                    </div>
+                </div>
+
+                <div class="divider"></div>
+
+                <div class="stat-row">
+                    <span>BEST SCORE</span>
+                    <strong id="bestScore">0</strong>
+                </div>
+
+                <div class="stat-row">
+                    <span>GAMES</span>
+                    <strong id="gamesPlayed">0</strong>
+                </div>
+
+            </section>
+
+
+            <section class="panel-card">
+
+                <div class="section-label">HOLD</div>
+
+                <div class="piece-preview hold-preview" id="holdBoard">
+                    <span class="empty-message">NONE</span>
+                </div>
+
+                <p class="hint">Press <kbd>C</kbd> to hold</p>
+
+            </section>
+
+
+            <section class="panel-card controls-card">
+
+                <div class="section-label">CONTROLS</div>
+
+                <div class="control-item">
+                    <div class="key-group">
+                        <kbd>←</kbd>
+                        <kbd>↓</kbd>
+                        <kbd>→</kbd>
+                    </div>
+                    <span>Move</span>
+                </div>
+
+                <div class="control-item">
+                    <kbd>↑</kbd>
+                    <span>Rotate</span>
+                </div>
+
+                <div class="control-item">
+                    <kbd>SPACE</kbd>
+                    <span>Hard Drop</span>
+                </div>
+
+                <div class="control-item">
+                    <kbd>P</kbd>
+                    <span>Pause</span>
+                </div>
+
+            </section>
+
+        </aside>
+
+
+        <!-- CENTER GAME -->
+        <section class="game-section">
+
+            <div class="game-header">
+
+                <div>
+                    <span class="game-label">CURRENT MATCH</span>
+                    <h2>CLASSIC TETRIS</h2>
+                </div>
+
+                <div class="match-status" id="matchStatus">
+                    READY
+                </div>
+
+            </div>
+
+
+            <div class="game-wrapper">
+
+                <div class="board-container">
+
+                    <canvas id="gameCanvas" width="300" height="600"></canvas>
+
+                    <div id="pauseOverlay" class="game-overlay hidden">
+
+                        <div class="overlay-box">
+
+                            <div class="overlay-icon">Ⅱ</div>
+
+                            <h2>GAME PAUSED</h2>
+
+                            <p>Press <kbd>P</kbd> or tap Resume</p>
+
+                            <button id="resumeBtn" class="primary-btn">
+                                RESUME GAME
+                            </button>
+
+                        </div>
+
+                    </div>
+
+
+                    <div id="gameOverOverlay" class="game-overlay hidden">
+
+                        <div class="overlay-box">
+
+                            <div class="overlay-icon">✦</div>
+
+                            <span class="game-over-label">MATCH COMPLETE</span>
+
+                            <h2>GAME OVER</h2>
+
+                            <div class="final-score">
+                                <span>SCORE</span>
+                                <strong id="finalScore">0</strong>
+                            </div>
+
+                            <button id="restartBtn" class="primary-btn">
+                                PLAY AGAIN
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- MOBILE CONTROLS -->
+            <div class="mobile-controls">
+
+                <button data-action="left">←</button>
+
+                <button data-action="rotate">↻</button>
+
+                <button data-action="down">↓</button>
+
+                <button data-action="right">→</button>
+
+                <button data-action="drop" class="drop-btn">DROP</button>
+
+            </div>
+
+
+            <div class="game-actions">
+
+                <button id="pauseBtn" class="secondary-btn">
+                    Ⅱ PAUSE
+                </button>
+
+                <button id="newGameBtn" class="primary-btn">
+                    + NEW GAME
+                </button>
+
+            </div>
+
+        </section>
+
+
+        <!-- RIGHT PANEL -->
+        <aside class="side-panel right-panel">
+
+            <section class="panel-card stats-card">
+
+                <div class="section-label">MATCH STATS</div>
+
+                <div class="big-stat">
+                    <span>SCORE</span>
+                    <strong id="score">0</strong>
+                </div>
+
+                <div class="stat-grid">
+
+                    <div>
+                        <span>LEVEL</span>
+                        <strong id="level">1</strong>
+                    </div>
+
+                    <div>
+                        <span>LINES</span>
+                        <strong id="lines">0</strong>
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <section class="panel-card">
+
+                <div class="section-label">NEXT PIECE</div>
+
+                <div class="piece-preview" id="nextBoard"></div>
+
+            </section>
+
+
+            <section class="panel-card leaderboard-card">
+
+                <div class="leaderboard-header">
+
+                    <div class="section-label">LEADERBOARD</div>
+
+                    <span>TOP 5</span>
+
+                </div>
+
+                <div id="leaderboard">
+
+                    <div class="leader-row">
+                        <span class="rank">01</span>
+                        <span class="leader-name">TETRIS KING</span>
+                        <strong>98500</strong>
+                    </div>
+
+                    <div class="leader-row">
+                        <span class="rank">02</span>
+                        <span class="leader-name">BLOCK MASTER</span>
+                        <strong>87200</strong>
+                    </div>
+
+                    <div class="leader-row">
+                        <span class="rank">03</span>
+                        <span class="leader-name">PIXEL PRO</span>
+                        <strong>81450</strong>
+                    </div>
+
+                    <div class="leader-row">
+                        <span class="rank">04</span>
+                        <span class="leader-name">STACKER</span>
+                        <strong>76800</strong>
+                    </div>
+
+                    <div class="leader-row">
+                        <span class="rank">05</span>
+                        <span class="leader-name">BLOCK HERO</span>
+                        <strong>70100</strong>
+                    </div>
+
+                </div>
+
+            </section>
+
+        </aside>
+
+    </main>
+
+
+    <footer class="footer">
+
+        <span>© 2026 TETRIS ARENA</span>
+
+        <div>
+            <span>GAME SERVER</span>
+            <span class="footer-status">● OPERATIONAL</span>
+        </div>
+
+    </footer>
+
+
+    <script src="game.js"></script>
+
+</body>
+</html>
