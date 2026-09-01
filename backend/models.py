@@ -1,8 +1,6 @@
-from datetime import datetime, timezone
+from datetime import datetime
 
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import Integer, String, DateTime
-
 
 db = SQLAlchemy()
 
@@ -10,11 +8,12 @@ db = SQLAlchemy()
 class Player(db.Model):
     __tablename__ = "players"
 
-    id = db.Column(Integer, primary_key=True)
-    username = db.Column(String(50), unique=True, nullable=False, index=True)
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(100), unique=True, nullable=False)
+
     created_at = db.Column(
-        DateTime,
-        default=lambda: datetime.now(timezone.utc),
+        db.DateTime,
+        default=datetime.utcnow,
         nullable=False
     )
 
@@ -29,22 +28,34 @@ class Player(db.Model):
 class Score(db.Model):
     __tablename__ = "scores"
 
-    id = db.Column(Integer, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True)
 
     player_id = db.Column(
-        Integer,
+        db.Integer,
         db.ForeignKey("players.id"),
-        nullable=False,
-        index=True
+        nullable=False
     )
 
-    score = db.Column(Integer, nullable=False)
-    lines = db.Column(Integer, nullable=False, default=0)
-    level = db.Column(Integer, nullable=False, default=1)
+    score = db.Column(
+        db.Integer,
+        nullable=False,
+        default=0
+    )
+
+    lines = db.Column(
+        db.Integer,
+        nullable=False,
+        default=0
+    )
+
+    level = db.Column(
+        db.Integer,
+        nullable=False,
+        default=1
+    )
 
     created_at = db.Column(
-        DateTime,
-        default=lambda: datetime.now(timezone.utc),
-        nullable=False,
-        index=True
+        db.DateTime,
+        default=datetime.utcnow,
+        nullable=False
     )
