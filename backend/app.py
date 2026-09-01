@@ -8,8 +8,13 @@ from models import db, Player, Score
 app = Flask(__name__)
 app.config.from_object(Config)
 
+# Initialize database
 db.init_app(app)
 
+
+# =========================================================
+# HOME
+# =========================================================
 
 @app.route("/")
 def home():
@@ -19,6 +24,10 @@ def home():
         "version": "1.0.0"
     })
 
+
+# =========================================================
+# HEALTH CHECK
+# =========================================================
 
 @app.route("/health")
 def health():
@@ -38,12 +47,20 @@ def health():
         }), 503
 
 
+# =========================================================
+# API STATUS
+# =========================================================
+
 @app.route("/api")
 def api_status():
     return jsonify({
         "message": "Tetris API is running"
     })
 
+
+# =========================================================
+# SUBMIT SCORE
+# =========================================================
 
 @app.route("/api/scores", methods=["POST"])
 def submit_score():
@@ -55,11 +72,13 @@ def submit_score():
     lines = data.get("lines", 0)
     level = data.get("level", 1)
 
+    # Validate username
     if not username:
         return jsonify({
             "error": "Username is required"
         }), 400
 
+    # Validate score
     if score is None:
         return jsonify({
             "error": "Score is required"
@@ -69,11 +88,13 @@ def submit_score():
         score = int(score)
         lines = int(lines)
         level = int(level)
+
     except (TypeError, ValueError):
         return jsonify({
             "error": "Score, lines and level must be numbers"
         }), 400
 
+    # Validate values
     if score < 0:
         return jsonify({
             "error": "Score cannot be negative"
@@ -89,15 +110,23 @@ def submit_score():
             "error": "Level must be at least 1"
         }), 400
 
+    # Find existing player
     player = db.session.execute(
-        db.select(Player).where(Player.username == username)
+        db.select(Player)
+        .where(Player.username == username)
     ).scalar_one_or_none()
 
+    # Create player if not found
     if player is None:
-        player = Player(username=username)
+
+        player = Player(
+            username=username
+        )
+
         db.session.add(player)
         db.session.flush()
 
+    # Create score
     new_score = Score(
         player_id=player.id,
         score=score,
@@ -120,20 +149,34 @@ def submit_score():
     }), 201
 
 
+# =========================================================
+# LEADERBOARD
+# =========================================================
+
 @app.route("/api/leaderboard", methods=["GET"])
 def leaderboard():
 
-    limit = request.args.get("limit", 10, type=int)
+    # Get requested limit
+    limit = request.args.get(
+        "limit",
+        10,
+        type=int
+    )
 
+    # Protect against invalid values
     if limit is None or limit < 1:
         limit = 10
 
     if limit > 100:
         limit = 100
 
+    # Get highest scores first
     results = db.session.execute(
         db.select(Score, Player)
-        .join(Player, Score.player_id == Player.id)
+        .join(
+            Player,
+            Score.player_id == Player.id
+        )
         .order_by(
             desc(Score.score),
             desc(Score.lines),
@@ -144,15 +187,27 @@ def leaderboard():
 
     leaderboard_data = []
 
-    for rank, (score_record, player) in enumerate(results, start=1):
+    # Build leaderboard response
+    for rank, (score_record, player) in enumerate(
+        results,
+        start=1
+    ):
 
         leaderboard_data.append({
+
             "rank": rank,
+
             "username": player.username,
+
             "score": score_record.score,
+
             "lines": score_record.lines,
+
             "level": score_record.level,
-            "created_at": score_record.created_at.isoformat()
+
+            "created_at": (
+                score_record.created_at.isoformat()
+            )
         })
 
     return jsonify({
@@ -160,18 +215,28 @@ def leaderboard():
     })
 
 
-@app.route("/api/players/<username>", methods=["GET"])
+# =========================================================
+# PLAYER STATISTICS
+# =========================================================
+
+@app.route(
+    "/api/players/<username>",
+    methods=["GET"]
+)
 def player_stats(username):
 
     player = db.session.execute(
-        db.select(Player).where(Player.username == username)
+        db.select(Player)
+        .where(Player.username == username)
     ).scalar_one_or_none()
 
     if player is None:
+
         return jsonify({
             "error": "Player not found"
         }), 404
 
+    # Get player's scores
     scores = db.session.execute(
         db.select(Score)
         .where(Score.player_id == player.id)
@@ -191,33 +256,56 @@ def player_stats(username):
     )
 
     return jsonify({
+
         "username": player.username,
+
         "statistics": {
+
             "total_games": total_games,
+
             "best_score": best_score,
+
             "best_lines": best_lines
         },
+
         "scores": [
+
             {
                 "score": item.score,
+
                 "lines": item.lines,
+
                 "level": item.level,
-                "created_at": item.created_at.isoformat()
+
+                "created_at": (
+                    item.created_at.isoformat()
+                )
             }
+
             for item in scores
         ]
     })
 
 
+# =========================================================
+# 404 ERROR
+# =========================================================
+
 @app.errorhandler(404)
 def not_found(error):
+
     return jsonify({
         "error": "Endpoint not found"
     }), 404
 
 
+# =========================================================
+# 500 ERROR
+# =========================================================
+
 @app.errorhandler(500)
 def internal_error(error):
+
     db.session.rollback()
 
     return jsonify({
@@ -225,11 +313,21 @@ def internal_error(error):
     }), 500
 
 
+# =========================================================
+# CREATE DATABASE TABLES
+# =========================================================
+
 with app.app_context():
+
     db.create_all()
 
 
+# =========================================================
+# START APPLICATION
+# =========================================================
+
 if __name__ == "__main__":
+
     app.run(
         host="0.0.0.0",
         port=5000,
