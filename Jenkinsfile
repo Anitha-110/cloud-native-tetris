@@ -3,12 +3,6 @@ pipeline {
 
     stages {
 
-        stage('Checkout') {
-            steps {
-                git 'https://github.com/Anitha-110/cloud-native-tetris.git'
-            }
-        }
-
         stage('Build Backend Image') {
             steps {
                 sh '''
