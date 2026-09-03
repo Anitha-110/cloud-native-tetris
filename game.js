@@ -1069,7 +1069,7 @@ function drawHoldPiece() {
 */
 
 const API_BASE_URL =
-    "http://127.0.0.1:5000";
+    "http://13.232.107.199:5000";
 
 
 async function submitScoreToBackend() {
