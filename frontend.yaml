@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tetris-frontend
+  namespace: tetris
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: tetris-frontend
+  template:
+    metadata:
+      labels:
+        app: tetris-frontend
+    spec:
+      containers:
+        - name: frontend
+          image: tetris-frontend:latest
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 80
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: tetris-frontend
+  namespace: tetris
+spec:
+  selector:
+    app: tetris-frontend
+  ports:
+    - port: 80
+      targetPort: 80
+      nodePort: 30080
+  type: NodePort

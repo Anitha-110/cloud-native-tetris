@@ -1,0 +1,55 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tetris-backend
+  namespace: tetris
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: tetris-backend
+  template:
+    metadata:
+      labels:
+        app: tetris-backend
+    spec:
+      containers:
+        - name: backend
+          image: tetris-backend:latest
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 5000
+          env:
+            - name: DB_HOST
+              value: mysql
+            - name: DB_PORT
+              value: "3306"
+            - name: DB_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-secret
+                  key: MYSQL_DATABASE
+            - name: DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-secret
+                  key: MYSQL_USER
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-secret
+                  key: MYSQL_PASSWORD
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: tetris-backend
+  namespace: tetris
+spec:
+  selector:
+    app: tetris-backend
+  ports:
+    - port: 5000
+      targetPort: 5000
+  type: ClusterIP
