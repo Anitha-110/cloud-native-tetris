@@ -21,4 +21,5 @@
 <img width="1361" height="642" alt="44" src="https://github.com/user-attachments/assets/bbdf9b50-c2e4-4714-8bbb-d86215d01e2b" />
 
 * 📈 **Grafana:** Visualized monitoring metrics through Grafana dashboards.
+<img width="1363" height="661" alt="IMG-20260903-WA0006" src="https://github.com/user-attachments/assets/54ae60bc-7bb6-4890-b937-31ca025c5628" />
 
